@@ -71,6 +71,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.widget import Widget
 
+from tempfile import mkdtemp
 
 __all__ = ('DesignerApp', )
 
@@ -760,8 +761,7 @@ class Designer(FloatLayout):
 
         self.close_popup()
 
-        new_proj_dir = os.path.join(get_config_dir(),
-                                    constants.NEW_PROJECT_DIR_NAME)
+        new_proj_dir = mkdtemp(prefix='temp')
         if os.path.exists(new_proj_dir):
             shutil.rmtree(new_proj_dir)
 
