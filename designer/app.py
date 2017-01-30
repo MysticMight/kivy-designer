@@ -870,6 +870,9 @@ class Designer(FloatLayout):
         '''
         self.close_popup()
 
+        new_project = self.project_manager.current_project.new_project
+        temp_proj_dir = self.project_manager.current_project.path
+
         self.remove_widget(self.designer_content)
         self.designer_content.parent = None
         self.add_widget(self.start_page, 1)
@@ -884,6 +887,25 @@ class Designer(FloatLayout):
         self.ids['actn_menu_tools'].disabled = True
         self.project_manager.close_current_project()
         self.project_watcher.stop_watching()
+
+        if new_project:
+            self.remove_temp_proj_dir(temp_proj_dir)
+
+    def remove_temp_proj_dir(self, temp_proj_dir):
+        '''
+        Delete the current temp project directory.
+        If the project is still open, the temp
+        project directory can be retrieved using
+        '''
+
+        # TODO: remove temp folder for project once saved or closed
+        # currently just prints the path to delete
+        print("CURRENT project path: <{:s}>"
+              .format(temp_proj_dir))
+
+        # TODO uncomment, when project path is assured to
+        # be temp directory
+        # shutil.rmtree(proj_dir)
 
     def _show_open_dialog(self, *args):
         '''To show FileBrowser to "Open" a project
@@ -1015,6 +1037,7 @@ class Designer(FloatLayout):
         else:
             self.save_project()
             if exit_on_save:
+                self.remove_temp_proj_dir(proj.path)
                 self._perform_quit()
 
     def action_btn_save_as_pressed(self, exit_on_save=False, *args):
@@ -1060,6 +1083,8 @@ class Designer(FloatLayout):
         self.save_project()
         copy_tree(self.project_manager.current_project.path, proj_dir)
         if exit_on_save:
+            if self.project_manager.current_project.new_project:
+                self.remove_temp_proj_dir(self.project_manager.current_project.path)
             self._perform_quit()
             return
         self._perform_open(proj_dir)
@@ -1192,11 +1217,15 @@ class Designer(FloatLayout):
                                                        'not saved.\nWhat '
                                                        'would you like to do?')
 
+            def dont_save(*args):
+                self.remove_temp_proj_dir(proj.path)
+                self._perform_quit()
+
             def save(*args):
                 self.close_popup()
                 self.action_btn_save_pressed(exit_on_save=True)
 
-            _confirm_dlg_save.bind(on_dont_save=self._perform_quit,
+            _confirm_dlg_save.bind(on_dont_save=dont_save,
                                    on_save=save,
                                    on_cancel=self.close_popup)
 
