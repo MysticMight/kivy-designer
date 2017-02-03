@@ -761,7 +761,7 @@ class Designer(FloatLayout):
 
         self.close_popup()
 
-        new_proj_dir = mkdtemp(prefix='temp')
+        new_proj_dir = mkdtemp(prefix=constants.NEW_PROJECT_DIR_NAME_PREFIX)
         if os.path.exists(new_proj_dir):
             shutil.rmtree(new_proj_dir)
 
@@ -893,19 +893,24 @@ class Designer(FloatLayout):
 
     def remove_temp_proj_dir(self, temp_proj_dir):
         '''
-        Delete the current temp project directory.
+        Delete the current temp project directory, if it contains
+        the NEW_PROJECT_DIR_NAME_PREFIX.
         If the project is still open, the temp
         project directory can be retrieved using
+            :param temp_proj_dir: path of temp project directory
         '''
 
-        # TODO: remove temp folder for project once saved or closed
-        # currently just prints the path to delete
-        print("CURRENT project path: <{:s}>"
-              .format(temp_proj_dir))
+        # FIXME: Doesn't work if file is still being used by process
+        # e.g. file watcher
+        temp_folder_name = temp_proj_dir.split('\\')[-1]
+        if temp_folder_name.startswith(
+                constants.NEW_PROJECT_DIR_NAME_PREFIX):
+            # TODO: remove debug print
+            # currently just prints the path to delete
+            print("CURRENT project path: <{:s}>"
+                  .format(temp_proj_dir))
 
-        # TODO uncomment, when project path is assured to
-        # be temp directory
-        # shutil.rmtree(proj_dir)
+            shutil.rmtree(temp_proj_dir)
 
     def _show_open_dialog(self, *args):
         '''To show FileBrowser to "Open" a project
