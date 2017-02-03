@@ -1080,10 +1080,11 @@ class Designer(FloatLayout):
             proj_dir = instance.ids.icon_view.path
 
         # save the project in the folder and then copy it to a new folder
+        new_project = self.project_manager.current_project.new_project
         self.save_project()
         copy_tree(self.project_manager.current_project.path, proj_dir)
         if exit_on_save:
-            if self.project_manager.current_project.new_project:
+            if new_project:
                 self.remove_temp_proj_dir(self.project_manager.current_project.path)
             self._perform_quit()
             return
