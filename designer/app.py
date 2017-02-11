@@ -761,11 +761,8 @@ class Designer(FloatLayout):
 
         self.close_popup()
 
-        new_proj_dir = mkdtemp(prefix=constants.NEW_PROJECT_DIR_NAME_PREFIX)
-        if os.path.exists(new_proj_dir):
-            shutil.rmtree(new_proj_dir)
-
-        os.mkdir(new_proj_dir)
+        new_proj_dir = mkdtemp(prefix=constants.NEW_PROJECT_DIR_NAME_PREFIX,
+                               dir=get_config_dir())
 
         template = self._new_dialog.adapter.selection[0].text
         kv_file = NEW_PROJECTS[template][0]
@@ -900,15 +897,20 @@ class Designer(FloatLayout):
             :param temp_proj_dir: path of temp project directory
         '''
 
-        # FIXME: Doesn't work if file is still being used by process
-        # e.g. file watcher
-        temp_folder_name = temp_proj_dir.split('\\')[-1]
+        temp_folder_name = temp_proj_dir.split(os.sep)[-1]
         if temp_folder_name.startswith(
                 constants.NEW_PROJECT_DIR_NAME_PREFIX):
             # TODO: remove debug print
             # currently just prints the path to delete
             print("CURRENT project path: <{:s}>"
                   .format(temp_proj_dir))
+            print("CURRENT directory is: <{:s}>"
+                  .format(os.getcwd()))
+
+            if os.getcwd() == temp_proj_dir:
+                os.chdir(get_config_dir())
+                print("Changed current directory to: <{:s}>"
+                      .format(os.getcwd()))
 
             shutil.rmtree(temp_proj_dir)
 
