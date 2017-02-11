@@ -1090,9 +1090,11 @@ class Designer(FloatLayout):
         new_project = self.project_manager.current_project.new_project
         self.save_project()
         copy_tree(self.project_manager.current_project.path, proj_dir)
+
+        if new_project:
+            self.remove_temp_proj_dir(self.project_manager.current_project.path)
+
         if exit_on_save:
-            if new_project:
-                self.remove_temp_proj_dir(self.project_manager.current_project.path)
             self._perform_quit()
             return
         self._perform_open(proj_dir)
